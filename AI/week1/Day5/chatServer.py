@@ -3,12 +3,12 @@ import socket
 import threading
 
 # use the dictory to save { client_socket: username}
-clients_names = {}
+client_names = {}
 
-def broadcast(message, current_clicnet):
+def broadcast(message, current_client):
     """the message send for everybody(without the sender)"""
-    for client in clients_names:
-        if client != current_clicnet:
+    for client in client_names:
+        if client != current_client:
             try:
                 client.send(message)
             except:
@@ -24,7 +24,7 @@ def handle_client(client_socket, client_address):
             username = f"User_{client_address[1]}"
 
         # record to the dictionary
-        clients_names[client_socket] = username
+        client_names[client_socket] = username
         print(f"[new connection] {client_address} already regesiter nickname: {username}")
 
         # postcast for everybody: who are joing the chats
@@ -34,7 +34,7 @@ def handle_client(client_socket, client_address):
         # [key step 2] start receive the user chats message
         while True: 
             message = client_socket.recv(1024)
-            if message:
+            if not message:
                 break
                 
             # formatt the message: add the sender name
@@ -49,9 +49,9 @@ def handle_client(client_socket, client_address):
 
 def remove_client(client_socket):
     """remove the inactive client"""
-    if client_socket in clients_names:
-        username = clients_names[client_socket]
-        del clients_names[client_socket]
+    if client_socket in client_names:
+        username = client_names[client_socket]
+        del client_names[client_socket]
         client_socket.close()
 
         print(f"inactive {username} are leave.")
@@ -60,7 +60,7 @@ def remove_client(client_socket):
 
 def start_server():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.setcsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server.bind(('127.0.0.1', 12345))
     server.listen()
     print("[start] chats server are running, waiting for connection...")
