@@ -1,0 +1,285 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #0a0a0a;
+    color: #e0e0e0;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+#role-selection {
+    text-align: center;
+}
+
+#role-selection h1 {
+    font-size: 2.5em;
+    margin-bottom: 30px;
+    color: #fff;
+    text-shadow: 0 0 10px rgba(255,255,255,0.3);
+}
+
+#role-options {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.role-card {
+    background: #1a1a2e;
+    border: 2px solid #333;
+    border-radius: 12px;
+    padding: 30px;
+    width: 180px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.role-card:hover {
+    border-color: #666;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+}
+
+.role-card .shape {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 15px;
+}
+
+.role-card .shape.square {
+    background: #e74c3c;
+    border-radius: 4px;
+}
+
+.role-card .shape.triangle {
+    width: 0;
+    height: 0;
+    border-left: 40px solid transparent;
+    border-right: 40px solid transparent;
+    border-bottom: 80px solid #3498db;
+    background: transparent;
+}
+
+.role-card .shape.circle {
+    background: #2ecc71;
+    border-radius: 50%;
+}
+
+.role-card .shape.rectangle {
+    background: #9b59b6;
+    border-radius: 4px;
+    height: 60px;
+    margin-top: 10px;
+}
+
+.role-card h3 {
+    font-size: 1.3em;
+    margin-bottom: 5px;
+    color: #fff;
+}
+
+.role-card p {
+    font-size: 0.85em;
+    color: #aaa;
+}
+
+#game-container {
+    position: relative;
+}
+
+#hud {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background: #111;
+    border: 1px solid #333;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+}
+
+#health-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    max-width: 300px;
+}
+
+#health-bar #health-fill {
+    height: 20px;
+    background: linear-gradient(90deg, #e74c3c, #2ecc71);
+    border-radius: 10px;
+    transition: width 0.3s;
+    width: 100%;
+}
+
+#health-bar #health-text {
+    font-size: 0.9em;
+    min-width: 30px;
+    color: #fff;
+}
+
+#score-display {
+    font-size: 1.1em;
+    color: #f1c40f;
+}
+
+#game-canvas {
+    display: block;
+    background: #0d0d1a;
+    border: 1px solid #333;
+    cursor: none;
+}
+
+#command-input-area {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+}
+
+#command-input {
+    width: 300px;
+    padding: 8px 12px;
+    background: #1a1a2e;
+    border: 2px solid #555;
+    color: #fff;
+    font-size: 1em;
+    border-radius: 6px;
+    outline: none;
+}
+
+#command-input:focus {
+    border-color: #f1c40f;
+}
+
+#spell-modal {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+}
+
+#spell-content {
+    background: #1a1a2e;
+    border: 2px solid #e74c3c;
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+}
+
+#spell-content h2 {
+    color: #e74c3c;
+    margin-bottom: 15px;
+}
+
+#spell-word {
+    font-size: 2em;
+    color: #f1c40f;
+    margin-bottom: 20px;
+    letter-spacing: 3px;
+}
+
+#spell-input {
+    width: 100%;
+    padding: 10px;
+    background: #0d0d1a;
+    border: 2px solid #555;
+    color: #fff;
+    font-size: 1.2em;
+    text-align: center;
+    border-radius: 6px;
+    outline: none;
+    margin-bottom: 15px;
+}
+
+#spell-input:focus {
+    border-color: #f1c40f;
+}
+
+#spell-submit {
+    padding: 10px 30px;
+    background: #2ecc71;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+#spell-submit:hover {
+    background: #27ae60;
+}
+
+#spell-result {
+    margin-top: 10px;
+    font-size: 1em;
+}
+
+#game-over-modal {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 30;
+}
+
+#game-over-content {
+    background: #1a1a2e;
+    border: 2px solid #e74c3c;
+    border-radius: 12px;
+    padding: 50px;
+    text-align: center;
+}
+
+#game-over-content h1 {
+    color: #e74c3c;
+    font-size: 3em;
+    margin-bottom: 15px;
+}
+
+#game-over-content p {
+    font-size: 1.3em;
+    margin-bottom: 25px;
+    color: #f1c40f;
+}
+
+#restart-btn {
+    padding: 12px 40px;
+    background: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+#restart-btn:hover {
+    background: #2980b9;
+}

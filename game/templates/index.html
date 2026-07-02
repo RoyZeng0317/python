@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Game</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div id="role-selection">
+        <h1>Choose Your Role</h1>
+        <div id="role-options"></div>
+    </div>
+    <div id="game-container" style="display:none">
+        <div id="hud">
+            <div id="health-bar">
+                <div id="health-fill"></div>
+                <span id="health-text">100</span>
+            </div>
+            <div id="score-display">Score: <span id="score">0</span></div>
+        </div>
+        <canvas id="game-canvas" width="800" height="600"></canvas>
+        <div id="command-input-area" style="display:none">
+            <input type="text" id="command-input" placeholder="Type command..." autofocus>
+        </div>
+        <div id="spell-modal" style="display:none">
+            <div id="spell-content">
+                <h2>Spell the word to survive!</h2>
+                <p id="spell-word"></p>
+                <input type="text" id="spell-input" autofocus>
+                <button id="spell-submit">Submit</button>
+                <p id="spell-result"></p>
+            </div>
+        </div>
+        <div id="game-over-modal" style="display:none">
+            <div id="game-over-content">
+                <h1>Game Over</h1>
+                <p>Final Score: <span id="final-score">0</span></p>
+                <button id="restart-btn">Play Again</button>
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='game.js') }}"></script>
+</body>
+</html>

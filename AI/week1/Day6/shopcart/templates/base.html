@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ShopCart 購物車{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="nav-container">
+                <a href="/" class="logo">ShopCart</a>
+                <ul class="nav-links">
+                    <li><a href="/">首頁</a></li>
+                    <li><a href="/products">商品</a></li>
+                    <li><a href="/cart">購物車 <span id="cart-count" class="badge">0</span></a></li>
+                    <li id="auth-links">
+                        <a href="/login">登入</a>
+                        <a href="/register">註冊</a>
+                    </li>
+                    <li id="user-info" style="display:none;">
+                        <span id="nav-username"></span>
+                        <a href="#" id="logout-btn">登出</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2026 ShopCart 購物車系統</p>
+    </footer>
+
+    <script src="/static/js/app.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

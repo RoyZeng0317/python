@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}結帳 - ShopCart{% endblock %}
+{% block content %}
+<section class="checkout-page">
+    <h2>結帳</h2>
+    <div class="checkout-container">
+        <div class="checkout-form">
+            <h3>收貨資訊</h3>
+            <form id="checkout-form">
+                <div class="form-group">
+                    <label for="shipping_address">收貨地址</label>
+                    <input type="text" id="shipping_address" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">聯絡電話</label>
+                    <input type="tel" id="phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="payment_method">付款方式</label>
+                    <select id="payment_method" required>
+                        <option value="">請選擇付款方式</option>
+                        <option value="credit_card">信用卡</option>
+                        <option value="line_pay">Line Pay</option>
+                        <option value="bank_transfer">銀行轉帳</option>
+                        <option value="cash_on_delivery">貨到付款</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">確認結帳</button>
+            </form>
+        </div>
+        <div class="checkout-summary">
+            <h3>訂單摘要</h3>
+            <div id="order-summary"></div>
+        </div>
+    </div>
+</section>
+{% endblock %}

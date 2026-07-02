@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}所有商品 - ShopCart{% endblock %}
+{% block content %}
+<section class="products-page">
+    <h2>所有商品</h2>
+    <div class="product-controls">
+        <select id="category-filter">
+            <option value="all">全部分類</option>
+            <option value="電子產品">電子產品</option>
+            <option value="包包配件">包包配件</option>
+            <option value="食品飲料">食品飲料</option>
+            <option value="居家生活">居家生活</option>
+        </select>
+        <select id="sort-by">
+            <option value="">預設排序</option>
+            <option value="price_asc">價格由低到高</option>
+            <option value="price_desc">價格由高到低</option>
+        </select>
+    </div>
+    <div class="product-grid" id="all-products"></div>
+    <div class="pagination" id="pagination"></div>
+</section>
+{% endblock %}

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理儀表板 - ShopCart</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="admin-page">
+    <header>
+        <nav>
+            <div class="nav-container">
+                <a href="/admin/dashboard" class="logo">ShopCart 後台</a>
+                <ul class="nav-links">
+                    <li><a href="/">回到前台</a></li>
+                    <li><a href="#" id="admin-logout-btn">登出</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <h2>管理儀表板</h2>
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <h3>總使用者</h3>
+                <p id="stat-users">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>總訂單數</h3>
+                <p id="stat-orders">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>總營收</h3>
+                <p id="stat-revenue">$0</p>
+            </div>
+        </div>
+
+        <div class="dashboard-section">
+            <h3>使用者消費統計</h3>
+            <table id="user-spending-table">
+                <thead>
+                    <tr>
+                        <th>使用者</th>
+                        <th>Email</th>
+                        <th>消費總額</th>
+                        <th>訂單數</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div class="dashboard-section">
+            <h3>近期訂單</h3>
+            <table id="recent-orders-table">
+                <thead>
+                    <tr>
+                        <th>訂單編號</th>
+                        <th>使用者</th>
+                        <th>金額</th>
+                        <th>狀態</th>
+                        <th>日期</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </main>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
