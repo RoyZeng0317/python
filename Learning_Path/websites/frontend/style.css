@@ -1,0 +1,186 @@
+:root {
+  --bg: #0f172a;
+  --card: #1e293b;
+  --border: #334155;
+  --accent: #38bdf8;
+  --done: #22c55e;
+  --active: #f59e0b;
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.topbar h1 {
+  font-size: 1.25rem;
+  margin: 0;
+}
+
+.clock {
+  font-variant-numeric: tabular-nums;
+  font-size: 1.1rem;
+  color: var(--accent);
+}
+
+.layout {
+  padding: 20px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.progress-panel {
+  margin-bottom: 20px;
+}
+
+.progress-bar {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.3s ease;
+}
+
+#progressText {
+  color: var(--muted);
+  margin: 8px 0;
+}
+
+.btn {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-right: 8px;
+}
+
+.btn.primary {
+  background: var(--accent);
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.btn.ghost {
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+}
+
+.btn.start-btn {
+  background: var(--border);
+  color: var(--text);
+  width: 100%;
+  margin-top: 10px;
+  margin-right: 0;
+}
+
+.btn.start-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.focus-panel {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.timer {
+  font-size: 2.5rem;
+  font-variant-numeric: tabular-nums;
+  margin: 10px 0;
+  color: var(--active);
+}
+
+.stage-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.stage-card {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid var(--border);
+}
+
+.stage-head {
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.stage-status.done {
+  color: var(--done);
+}
+
+.stage-status.active {
+  color: var(--active);
+}
+
+.stage-status.pending {
+  color: var(--muted);
+}
+
+.stage-subject {
+  margin: 8px 0 4px;
+}
+
+.stage-meta {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+@media (max-width: 480px) {
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 12px 16px;
+  }
+
+  .layout {
+    padding: 12px;
+  }
+
+  .stage-list {
+    grid-template-columns: 1fr;
+  }
+
+  .timer {
+    font-size: 2rem;
+  }
+
+  .btn {
+    width: 100%;
+    margin: 0 0 8px;
+  }
+}

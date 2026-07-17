@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>學習進度平台</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>學習進度平台</h1>
+    <div id="clock" class="clock">--:--:--</div>
+  </header>
+
+  <main class="layout">
+    <section class="progress-panel">
+      <div class="progress-bar">
+        <div id="progressFill" class="progress-fill"></div>
+      </div>
+      <p id="progressText">0 / 10 完成</p>
+      <button id="exportBtn" class="btn ghost">匯出 Markdown</button>
+      <button id="resetBtn" class="btn ghost">重新排程</button>
+    </section>
+
+    <section class="focus-panel" id="focusPanel" hidden>
+      <h2>專注計時中</h2>
+      <p id="focusSubject"></p>
+      <div id="focusTimer" class="timer">02:00:00</div>
+      <button id="completeBtn" class="btn primary">完成此進度</button>
+    </section>
+
+    <section class="stage-list" id="stageList"></section>
+  </main>
+
+  <template id="stageCardTpl">
+    <article class="stage-card">
+      <div class="stage-head">
+        <span class="stage-id"></span>
+        <span class="stage-status"></span>
+      </div>
+      <h3 class="stage-subject"></h3>
+      <p class="stage-meta"></p>
+      <button class="btn start-btn">開始</button>
+    </article>
+  </template>
+
+  <script src="script.js"></script>
+</body>
+</html>
