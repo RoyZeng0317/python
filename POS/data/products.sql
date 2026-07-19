@@ -1,0 +1,23 @@
+CREATE TABLE products (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    barcode TEXT UNIQUE NOT NULL,
+    name TEXT NOT NULL,
+    price INTEGER NOT NULL,
+    age_limit INTEGER DEFAULT 0
+);
+
+value()
+value(4711588006747)
+value(4717546061667)
+value(4710095951502)
+
+INSERT INTO products(barcode,name,price,age_limit)
+VALUES
+('4710095951502','冰鎮檸檬紅茶-535ml',29,0),
+('4711009696163','冰鎮花果茶',35,0),
+('4710946578193','再見南國-芒果風味',140,18),
+('4710053531234','尊爵香菸',95,20);
+('4710946578193', '')
+('4711588006747', '')
+('4717546061667', '')
+('4710022065098', '')
