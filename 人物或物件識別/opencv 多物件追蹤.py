@@ -22,7 +22,7 @@ while True:
         for i in range(2):
             area = cv2.selectROI('test', frame, showCrosshair=False, fromCenter=False)
             # 標記外框後設定物件追蹤演算法(CSRT 已移除,改用 MIL)
-            tracker = cv2.TrackerMIL_create()
+            tracker = cv2.TrackerMIL.create()
             tracker.init(frame, area)
             trackers.append(tracker)
         # 設定 True 開始追蹤
