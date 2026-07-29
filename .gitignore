@@ -1,0 +1,18 @@
+# Python 虛擬環境
+.venv/
+venv/
+env/
+
+# Python 編譯快取
+__pycache__/
+*.pyc
+*.pyo
+
+# C/C++ 編譯產物
+*.exe
+*.obj
+*.ilk
+*.pdb
+
+# MNIST 資料集（可重新下載，不進版控）
+MNIST/raw/
