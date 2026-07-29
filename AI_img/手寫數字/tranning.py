@@ -1,4 +1,5 @@
 # 需執行: pip install numpy torch torchvision matplotlib
+import os
 from typing import Any
 
 import torch
@@ -59,6 +60,10 @@ def main():
             loss.backward()     # 反向誤差值傳播
             optimizer.step()    # 提高網路參數
         print("epoch", epoch, "accuracy:", evaluate(test_data, net))    # 輸出當前網路的正確率
+    # 儲存訓練好的權重，供 即時手寫.py 直接載入使用
+    model_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "model.pth")
+    torch.save(net.state_dict(), model_path)
+    print("model saved to:", model_path)
     # 訓練完成後
     for(n, (x, _)) in enumerate(test_data):
         if n > 3:   # 隨機抽三張圖片
