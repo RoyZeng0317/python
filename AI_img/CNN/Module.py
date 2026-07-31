@@ -5,6 +5,7 @@
 資料集格式：ImageFolder 風格 -> DATA_DIR/類別A/*.jpg, DATA_DIR/類別B/*.jpg, ...
 """
 
+import os
 import random
 
 import torch
@@ -20,9 +21,8 @@ lr = 0.0003
 Img_Size = 224
 seed = 42
 
-# 資料集路徑：尚未確定要用哪個資料集，請指向 ImageFolder 格式的資料夾
-# 例如："../人物或物件識別/mask"（底下需有「戴口罩」「沒戴口罩」等分類子資料夾）
-DATA_DIR = ""
+# 資料集路徑：口罩偵測二分類（戴口罩 17 張 / 沒戴口罩 18 張，共 35 張，資料量很小，僅供跑通流程用）
+DATA_DIR = "../../人物或物件識別/mask"
 
 
 class SimpleCNN(nn.Module):
@@ -57,6 +57,22 @@ class SimpleCNN(nn.Module):
         return x
 
 
+class CleanImageFolder(datasets.ImageFolder):
+    """
+    ImageFolder 預設會把 data_dir 底下每個子資料夾都當成一個分類，
+    但 mask 資料夾裡混了 .venv、__pycache__ 這種非分類資料夾，
+    直接用會把虛擬環境的檔案也當成訓練資料，所以覆寫 find_classes 濾掉它們。
+    """
+
+    def find_classes(self, directory):
+        classes = sorted(
+            entry.name for entry in os.scandir(directory)
+            if entry.is_dir() and not entry.name.startswith(".") and entry.name != "__pycache__"
+        )
+        class_to_idx = {cls_name: i for i, cls_name in enumerate(classes)}
+        return classes, class_to_idx
+
+
 def build_dataloaders(data_dir):
     """
     讀取 ImageFolder 格式的資料集，並切分成訓練集 / 驗證集
@@ -67,7 +83,7 @@ def build_dataloaders(data_dir):
         transforms.ToTensor(),  # 圖片轉成 Tensor，並把像素值從 0~255 正規化到 0~1
     ])
 
-    dataset = datasets.ImageFolder(root=data_dir, transform=transform)
+    dataset = CleanImageFolder(root=data_dir, transform=transform)
 
     val_ratio = 0.2
     val_size = int(len(dataset) * val_ratio)
