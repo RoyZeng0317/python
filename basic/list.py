@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 # list 修改
 # fruits = ["watermelon", "pineapple", "dragon fruit"]
 
@@ -30,3 +31,17 @@ usr = {"name": "daniel", "age": 24, "gender": "male"}
 print(usr.get("score", 0)) # 沒有則輸出 0 表 False
 usr.update({"age": 20, "level": "入門"})
 print(usr.items())
+=======
+# fruits = ["watermelon", "pineapple", "dragon fruit"]
+
+# for fruit in fruits:
+#     print(fruit)
+
+students = ["Tom", "Bob", "Lucy", "Mike", "Jack"]
+
+students.append("Amy")
+students.remove("Jack")
+
+for i in range(len(students)):
+    print(f"第 {i + 1}. 位學生: {students[i]}")
+>>>>>>> Stashed changes

@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 # Python 虛擬環境
 .venv/
 venv/
@@ -16,3 +17,8 @@ __pycache__/
 
 # MNIST 資料集（可重新下載，不進版控）
 MNIST/raw/
+=======
+notes_client_config.json
+notes_server/data/*.json
+notes_server/certs/
+>>>>>>> Stashed changes
