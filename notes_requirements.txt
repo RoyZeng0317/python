@@ -1,0 +1,5 @@
+customtkinter>=6.0
+requests>=2.34
+pystray>=0.19
+keyboard>=0.13
+pillow>=12.0

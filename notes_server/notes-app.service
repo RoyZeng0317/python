@@ -1,0 +1,14 @@
+[Unit]
+Description=Notes App sync server
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/notes_server
+ExecStart=/home/pi/notes_server/.venv/bin/python /home/pi/notes_server/app.py
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

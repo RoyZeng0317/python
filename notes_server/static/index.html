@@ -1,0 +1,760 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>記事本</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f6f8f5;
+    --surface: #ffffff;
+    --surface-2: #eef2ec;
+    --surface-3: #e4ebe1;
+    --text: #1c2620;
+    --text-muted: #6c766e;
+    --text-faint: #98a196;
+    --border: #dde3d8;
+    --accent: #2f8f6f;
+    --accent-strong: #23735a;
+    --accent-soft: #dcefe5;
+    --danger: #c0392b;
+    --danger-soft: #f8e4e1;
+    --pin: #c8842a;
+    --ok: #2f8f6f;
+    --warn: #c8842a;
+    --shadow: 0 1px 2px rgba(28, 38, 32, 0.06), 0 8px 24px -12px rgba(28, 38, 32, 0.18);
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12160f;
+      --surface: #191f16;
+      --surface-2: #212a1c;
+      --surface-3: #2a3423;
+      --text: #e9ede4;
+      --text-muted: #9aa591;
+      --text-faint: #6b7565;
+      --border: #2c352a;
+      --accent: #52b28c;
+      --accent-strong: #6ec7a1;
+      --accent-soft: #1e3a2c;
+      --danger: #e0685a;
+      --danger-soft: #3a2320;
+      --pin: #e0a24f;
+      --ok: #52b28c;
+      --warn: #e0a24f;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #12160f;
+    --surface: #191f16;
+    --surface-2: #212a1c;
+    --surface-3: #2a3423;
+    --text: #e9ede4;
+    --text-muted: #9aa591;
+    --text-faint: #6b7565;
+    --border: #2c352a;
+    --accent: #52b28c;
+    --accent-strong: #6ec7a1;
+    --accent-soft: #1e3a2c;
+    --danger: #e0685a;
+    --danger-soft: #3a2320;
+    --pin: #e0a24f;
+    --ok: #52b28c;
+    --warn: #e0a24f;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Figtree", -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .app {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    height: 100vh;
+  }
+
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .sidebar-head {
+    padding: 20px 18px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sidebar-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .app-name-wrap { display: flex; flex-direction: column; gap: 2px; }
+  .app-name {
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  .sync-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.68rem;
+    color: var(--text-faint);
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+  }
+  .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ok); }
+  .sync-dot.offline { background: var(--warn); }
+
+  .new-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+  }
+  .new-btn:hover { background: var(--accent-strong); }
+  .new-btn:active { transform: scale(0.97); }
+  .new-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .search-wrap { position: relative; }
+  .search-wrap svg {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-faint);
+    pointer-events: none;
+  }
+  .search-input {
+    width: 100%;
+    padding: 8px 10px 8px 32px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.88rem;
+  }
+  .search-input::placeholder { color: var(--text-faint); }
+  .search-input:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+    background: var(--surface);
+  }
+
+  .list-scroll { flex: 1; overflow-y: auto; padding: 6px 10px 14px; }
+
+  .section-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    padding: 12px 8px 6px;
+  }
+
+  .note-item {
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    padding: 10px 10px;
+    margin-bottom: 3px;
+    cursor: pointer;
+    font-family: inherit;
+    color: var(--text);
+    display: block;
+  }
+  .note-item:hover { background: var(--surface-2); }
+  .note-item:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .note-item.active {
+    background: var(--accent-soft);
+    border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  }
+
+  .note-item-title {
+    font-size: 0.92rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .note-item-title .pin-dot { color: var(--pin); flex-shrink: 0; font-size: 0.75rem; }
+  .note-item-title .placeholder { color: var(--text-faint); font-weight: 500; }
+
+  .note-item-preview {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+  }
+
+  .note-item-time {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.68rem;
+    color: var(--text-faint);
+    margin-top: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .empty-list {
+    color: var(--text-faint);
+    font-size: 0.85rem;
+    text-align: center;
+    padding: 40px 12px;
+    line-height: 1.6;
+  }
+
+  .editor { display: flex; flex-direction: column; min-width: 0; background: var(--bg); }
+
+  .editor-empty {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+    color: var(--text-faint);
+    text-align: center;
+    padding: 20px;
+  }
+  .editor-empty svg { color: var(--border); }
+  .editor-empty p { margin: 0; font-size: 0.9rem; }
+  .editor-empty .hint { font-size: 0.8rem; color: var(--text-faint); }
+
+  .editor-body { display: none; flex-direction: column; height: 100%; min-width: 0; }
+  .editor-body.visible { display: flex; }
+
+  .editor-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 28px;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+  }
+
+  .toolbar-meta {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.72rem;
+    color: var(--text-faint);
+    font-variant-numeric: tabular-nums;
+  }
+  .save-state { display: inline-flex; align-items: center; gap: 5px; }
+  .save-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--text-faint);
+    transition: background 0.2s ease;
+  }
+  .save-dot.saved { background: var(--accent); }
+
+  .toolbar-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+  .icon-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    border-radius: 8px;
+    padding: 6px 11px;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .icon-btn:hover { background: var(--surface-2); border-color: var(--text-faint); }
+  .icon-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .icon-btn.pinned { background: color-mix(in srgb, var(--pin) 14%, var(--surface)); border-color: var(--pin); color: var(--pin); }
+  .icon-btn.danger:hover { background: var(--danger-soft); border-color: var(--danger); color: var(--danger); }
+
+  .editor-fields { flex: 1; display: flex; flex-direction: column; padding: 22px 28px 28px; min-height: 0; }
+
+  .title-input {
+    border: none;
+    background: transparent;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 1.55rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    padding: 0 0 12px;
+    width: 100%;
+  }
+  .title-input::placeholder { color: var(--text-faint); font-weight: 700; }
+  .title-input:focus-visible { outline: none; }
+
+  .content-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 1rem;
+    line-height: 1.75;
+    resize: none;
+    padding: 12px 0 0;
+    border-top: 1px solid var(--border);
+    min-height: 0;
+  }
+  .content-input::placeholder { color: var(--text-faint); }
+  .content-input:focus-visible { outline: none; }
+
+  .modal-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(10, 14, 9, 0.4);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+  }
+  .modal-backdrop.visible { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    padding: 22px;
+    width: min(320px, 90vw);
+  }
+  .modal h2 { margin: 0 0 8px; font-size: 1.05rem; }
+  .modal p { margin: 0 0 18px; font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 8px; }
+  .modal-actions button {
+    font-family: inherit;
+    border-radius: 8px;
+    padding: 7px 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text);
+  }
+  .modal-actions .confirm-danger { background: var(--danger); border-color: var(--danger); color: #fff; }
+
+  @media (max-width: 720px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar { display: flex; }
+    .sidebar.hidden-mobile { display: none; }
+    .editor { display: none; }
+    .editor.visible-mobile { display: flex; }
+    .back-btn { display: inline-flex !important; }
+  }
+
+  .back-btn {
+    display: none;
+    align-items: center;
+    gap: 4px;
+    background: transparent;
+    border: none;
+    color: var(--accent);
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 2px;
+  }
+
+  ::-webkit-scrollbar { width: 10px; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <div class="sidebar-title-row">
+        <div class="app-name-wrap">
+          <span class="app-name">我的記事本</span>
+          <span class="sync-status"><span class="sync-dot" id="syncDot"></span><span id="syncLabel">同步中</span></span>
+        </div>
+        <button class="new-btn" id="newBtn" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          新增
+        </button>
+      </div>
+      <div class="search-wrap">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input class="search-input" id="searchInput" type="text" placeholder="搜尋筆記..." autocomplete="off">
+      </div>
+    </div>
+    <div class="list-scroll" id="listScroll"></div>
+  </aside>
+
+  <main class="editor" id="editor">
+    <div class="editor-empty" id="editorEmpty">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2Z"/><path d="M9 13h6M9 17h4"/></svg>
+      <p>選一篇筆記來查看，或建立新的筆記</p>
+      <span class="hint">左上角「＋ 新增」即可開始寫</span>
+    </div>
+
+    <div class="editor-body" id="editorBody">
+      <div class="editor-toolbar">
+        <div style="display:flex; align-items:center; gap:10px; min-width:0;">
+          <button class="back-btn" id="backBtn" type="button">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            返回
+          </button>
+          <div class="toolbar-meta save-state">
+            <span class="save-dot" id="saveDot"></span>
+            <span id="saveLabel">建立於 —</span>
+          </div>
+        </div>
+        <div class="toolbar-actions">
+          <button class="icon-btn" id="pinBtn" type="button">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5M9 10.5 7 12h10l-2-1.5V4H9v6.5Z"/></svg>
+            置頂
+          </button>
+          <button class="icon-btn danger" id="deleteBtn" type="button">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
+            刪除
+          </button>
+        </div>
+      </div>
+      <div class="editor-fields">
+        <input class="title-input" id="titleInput" type="text" placeholder="標題" autocomplete="off">
+        <textarea class="content-input" id="contentInput" placeholder="開始輸入內容..."></textarea>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="modal-backdrop" id="confirmBackdrop">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <h2 id="confirmTitle">刪除筆記</h2>
+    <p>確定要刪除這篇筆記嗎？此動作無法復原。</p>
+    <div class="modal-actions">
+      <button id="cancelDelete" type="button">取消</button>
+      <button class="confirm-danger" id="confirmDelete" type="button">刪除</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const API = "/api/notes";
+  const POLL_MS = 4000;
+  let notes = [];
+  let activeId = null;
+  let saveTimer = null;
+  let editing = false;
+
+  const el = {
+    listScroll: document.getElementById("listScroll"),
+    searchInput: document.getElementById("searchInput"),
+    newBtn: document.getElementById("newBtn"),
+    editorEmpty: document.getElementById("editorEmpty"),
+    editorBody: document.getElementById("editorBody"),
+    titleInput: document.getElementById("titleInput"),
+    contentInput: document.getElementById("contentInput"),
+    pinBtn: document.getElementById("pinBtn"),
+    deleteBtn: document.getElementById("deleteBtn"),
+    saveLabel: document.getElementById("saveLabel"),
+    saveDot: document.getElementById("saveDot"),
+    backBtn: document.getElementById("backBtn"),
+    sidebar: document.getElementById("sidebar"),
+    editor: document.getElementById("editor"),
+    confirmBackdrop: document.getElementById("confirmBackdrop"),
+    cancelDelete: document.getElementById("cancelDelete"),
+    confirmDelete: document.getElementById("confirmDelete"),
+    syncDot: document.getElementById("syncDot"),
+    syncLabel: document.getElementById("syncLabel"),
+  };
+
+  function setSyncState(online) {
+    el.syncDot.classList.toggle("offline", !online);
+    el.syncLabel.textContent = online ? "已同步" : "離線";
+  }
+
+  function fmtTime(iso) {
+    const d = new Date(iso);
+    if (isNaN(d)) return "";
+    const pad = (n) => String(n).padStart(2, "0");
+    return `${d.getFullYear()}/${pad(d.getMonth() + 1)}/${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  function findNote(id) {
+    return notes.find((n) => n.id === id) || null;
+  }
+
+  async function refreshFromServer() {
+    try {
+      const res = await fetch(API);
+      if (!res.ok) throw new Error("bad status");
+      const fresh = await res.json();
+      setSyncState(true);
+      if (editing) {
+        const activeLocal = findNote(activeId);
+        notes = fresh.map((n) => (n.id === activeId && activeLocal ? { ...n, title: activeLocal.title, content: activeLocal.content } : n));
+      } else {
+        notes = fresh;
+      }
+      renderList();
+    } catch (e) {
+      setSyncState(false);
+    }
+  }
+
+  function sortedFiltered() {
+    const kw = el.searchInput.value.trim().toLowerCase();
+    let list = notes;
+    if (kw) {
+      list = notes.filter(
+        (n) => n.title.toLowerCase().includes(kw) || n.content.toLowerCase().includes(kw)
+      );
+    }
+    return [...list].sort((a, b) => {
+      if (!!a.pinned !== !!b.pinned) return a.pinned ? -1 : 1;
+      return b.updated_at.localeCompare(a.updated_at);
+    });
+  }
+
+  function renderList() {
+    const list = sortedFiltered();
+    el.listScroll.innerHTML = "";
+
+    if (list.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "empty-list";
+      empty.textContent = notes.length === 0 ? "還沒有筆記，點右上角新增第一篇吧" : "找不到符合的筆記";
+      el.listScroll.appendChild(empty);
+      return;
+    }
+
+    let renderedPinnedLabel = false;
+    let renderedAllLabel = false;
+
+    for (const note of list) {
+      if (note.pinned && !renderedPinnedLabel) {
+        el.listScroll.appendChild(sectionLabel("已置頂"));
+        renderedPinnedLabel = true;
+      }
+      if (!note.pinned && !renderedAllLabel && renderedPinnedLabel) {
+        el.listScroll.appendChild(sectionLabel("所有筆記"));
+        renderedAllLabel = true;
+      }
+      el.listScroll.appendChild(noteItem(note));
+    }
+  }
+
+  function sectionLabel(text) {
+    const d = document.createElement("div");
+    d.className = "section-label";
+    d.textContent = text;
+    return d;
+  }
+
+  function noteItem(note) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "note-item" + (note.id === activeId ? " active" : "");
+
+    const titleRow = document.createElement("div");
+    titleRow.className = "note-item-title";
+    if (note.pinned) {
+      const pin = document.createElement("span");
+      pin.className = "pin-dot";
+      pin.textContent = "●";
+      titleRow.appendChild(pin);
+    }
+    const titleText = document.createElement("span");
+    if (note.title.trim()) {
+      titleText.textContent = note.title;
+    } else {
+      titleText.textContent = "（無標題）";
+      titleText.className = "placeholder";
+    }
+    titleRow.appendChild(titleText);
+
+    const preview = document.createElement("div");
+    preview.className = "note-item-preview";
+    preview.textContent = note.content.trim().split("\n")[0] || "沒有內容";
+
+    const time = document.createElement("div");
+    time.className = "note-item-time";
+    time.textContent = fmtTime(note.updated_at);
+
+    btn.appendChild(titleRow);
+    btn.appendChild(preview);
+    btn.appendChild(time);
+    btn.addEventListener("click", () => selectNote(note.id));
+    return btn;
+  }
+
+  function selectNote(id) {
+    editing = false;
+    activeId = id;
+    const note = findNote(id);
+    if (!note) return;
+
+    el.editorEmpty.style.display = "none";
+    el.editorBody.classList.add("visible");
+    el.titleInput.value = note.title;
+    el.contentInput.value = note.content;
+    el.pinBtn.classList.toggle("pinned", !!note.pinned);
+    el.saveLabel.textContent = `建立於 ${fmtTime(note.created_at)}`;
+    el.saveDot.classList.remove("saved");
+
+    el.sidebar.classList.add("hidden-mobile");
+    el.editor.classList.add("visible-mobile");
+
+    renderList();
+  }
+
+  async function newNote() {
+    try {
+      const res = await fetch(API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: "", content: "" }),
+      });
+      const note = await res.json();
+      notes.unshift(note);
+      selectNote(note.id);
+      el.titleInput.focus();
+    } catch (e) {
+      setSyncState(false);
+    }
+  }
+
+  function scheduleSave() {
+    editing = true;
+    el.saveDot.classList.remove("saved");
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(commitEdits, 500);
+  }
+
+  async function commitEdits() {
+    const note = findNote(activeId);
+    if (!note) return;
+    const title = el.titleInput.value;
+    const content = el.contentInput.value;
+    try {
+      const res = await fetch(`${API}/${note.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, content }),
+      });
+      const updated = await res.json();
+      Object.assign(note, updated);
+      setSyncState(true);
+      el.saveDot.classList.add("saved");
+      editing = false;
+      renderList();
+    } catch (e) {
+      setSyncState(false);
+    }
+  }
+
+  async function togglePin() {
+    const note = findNote(activeId);
+    if (!note) return;
+    try {
+      const res = await fetch(`${API}/${note.id}/pin`, { method: "PATCH" });
+      const updated = await res.json();
+      Object.assign(note, updated);
+      el.pinBtn.classList.toggle("pinned", note.pinned);
+      renderList();
+    } catch (e) {
+      setSyncState(false);
+    }
+  }
+
+  function requestDelete() {
+    if (!activeId) return;
+    el.confirmBackdrop.classList.add("visible");
+  }
+
+  async function performDelete() {
+    const id = activeId;
+    el.confirmBackdrop.classList.remove("visible");
+    try {
+      await fetch(`${API}/${id}`, { method: "DELETE" });
+    } catch (e) {
+      setSyncState(false);
+    }
+    notes = notes.filter((n) => n.id !== id);
+    activeId = null;
+    editing = false;
+    el.editorBody.classList.remove("visible");
+    el.editorEmpty.style.display = "flex";
+    el.sidebar.classList.remove("hidden-mobile");
+    el.editor.classList.remove("visible-mobile");
+    renderList();
+  }
+
+  function goBackMobile() {
+    el.sidebar.classList.remove("hidden-mobile");
+    el.editor.classList.remove("visible-mobile");
+  }
+
+  el.newBtn.addEventListener("click", newNote);
+  el.searchInput.addEventListener("input", renderList);
+  el.titleInput.addEventListener("input", scheduleSave);
+  el.contentInput.addEventListener("input", scheduleSave);
+  el.pinBtn.addEventListener("click", togglePin);
+  el.deleteBtn.addEventListener("click", requestDelete);
+  el.cancelDelete.addEventListener("click", () => el.confirmBackdrop.classList.remove("visible"));
+  el.confirmDelete.addEventListener("click", performDelete);
+  el.confirmBackdrop.addEventListener("click", (e) => {
+    if (e.target === el.confirmBackdrop) el.confirmBackdrop.classList.remove("visible");
+  });
+  el.backBtn.addEventListener("click", goBackMobile);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") el.confirmBackdrop.classList.remove("visible");
+  });
+
+  refreshFromServer();
+  setInterval(refreshFromServer, POLL_MS);
+})();
+</script>
+</body>
+</html>
