@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="Calculator"
+           Manufacturer="Developer"
+           Version="1.0.0.0"
+           UpgradeCode="A1B2C3D4-E5F6-7890-ABCD-EF1234567890"
+           Scope="perMachine">
+
+    <SummaryInformation Description="多功能計算機安裝程式" Manufacturer="Developer" />
+
+    <MajorUpgrade DowngradeErrorMessage="已安裝較新版本，請先解除安裝後再重新安裝。" />
+
+    <Feature Id="Main">
+      <ComponentRef Id="MainExe" />
+      <ComponentRef Id="AppShortcut" />
+    </Feature>
+
+    <StandardDirectory Id="ProgramFilesFolder">
+      <Directory Id="INSTALLFOLDER" Name="計算機">
+        <Component Id="MainExe" Guid="11111111-2222-3333-4444-555555555555">
+          <File Id="MainExeFile" Source="dist\計算機\計算機.exe" KeyPath="yes" />
+        </Component>
+      </Directory>
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ApplicationProgramsFolder" Name="計算機">
+        <Component Id="AppShortcut" Guid="22222222-3333-4444-5555-666666666666">
+          <Shortcut Id="AppStartMenuShortcut"
+                    Name="計算機"
+                    Description="多功能計算機"
+                    Target="[INSTALLFOLDER]計算機.exe"
+                    WorkingDirectory="INSTALLFOLDER" />
+          <RegistryValue Root="HKCU"
+                         Key="Software\計算機"
+                         Name="installed"
+                         Type="integer"
+                         Value="1"
+                         KeyPath="yes" />
+        </Component>
+      </Directory>
+    </StandardDirectory>
+
+  </Package>
+</Wix>
