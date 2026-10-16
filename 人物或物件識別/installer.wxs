@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+
+  <Package Name="ObjectRecognition"
+           Manufacturer="Developer"
+           Version="1.0.0.0"
+           UpgradeCode="B2C3D4E5-F6A7-8901-BCDE-F12345678901"
+           Scope="perMachine">
+
+    <SummaryInformation Description="人物或物件識別工具集" Manufacturer="Developer" />
+
+    <MajorUpgrade DowngradeErrorMessage="已安裝較新版本，請先解除安裝後再重新安裝。" />
+
+    <Feature Id="Main">
+      <ComponentRef Id="MainExe" />
+      <ComponentRef Id="DataFiles" />
+      <ComponentRef Id="AppShortcut" />
+    </Feature>
+
+    <StandardDirectory Id="ProgramFilesFolder">
+      <Directory Id="INSTALLFOLDER" Name="ObjectRecognition">
+
+        <Component Id="MainExe" Guid="33333333-4444-5555-6666-777777777777">
+          <File Id="MainExeFile" Source="dist\人物或物件識別\人物或物件識別.exe" KeyPath="yes" />
+        </Component>
+
+        <Component Id="DataFiles" Guid="44444444-5555-6666-7777-888888888888">
+          <File Id="HandLandmarker" Source="hand_landmarker.task" />
+          <File Id="DanielJpg" Source="daniel.jpg" />
+          <File Id="CarsWebp" Source="cars.webp" />
+        </Component>
+
+      </Directory>
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ShortcutFolder" Name="ObjectRecognition">
+        <Component Id="AppShortcut" Guid="66666666-7777-8888-9999-AAAAAAAAAAAA">
+          <Shortcut Id="AppStartMenuShortcut"
+                    Name="人物或物件識別"
+                    Description="人物或物件識別工具集"
+                    Target="[INSTALLFOLDER]人物或物件識別.exe"
+                    WorkingDirectory="INSTALLFOLDER" />
+          <RegistryValue Root="HKCU"
+                         Key="Software\ObjectRecognition"
+                         Name="installed"
+                         Type="integer"
+                         Value="1"
+                         KeyPath="yes" />
+        </Component>
+      </Directory>
+    </StandardDirectory>
+
+  </Package>
+</Wix>
