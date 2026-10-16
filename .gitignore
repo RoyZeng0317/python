@@ -16,6 +16,13 @@ __pycache__/
 *.ilk
 *.pdb
 
+# PyInstaller / WiX 打包產物（dist 內的 torch、polars dll 單檔超過 GitHub 100MB 上限，可用 .spec 重新打包）
+build/
+dist/
+*.msi
+*.cab
+*.wixpdb
+
 # MNIST 資料集（可重新下載，不進版控）
 MNIST/raw/
 
