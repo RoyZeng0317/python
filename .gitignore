@@ -1,8 +1,9 @@
-<<<<<<< Updated upstream
 # Python 虛擬環境
 .venv/
 venv/
 env/
+# Conda 環境（例如 Image Processing/.conda，內含 1GB 的 tensorflow dll，超過 GitHub 100MB 上限）
+.conda/
 
 # Python 編譯快取
 __pycache__/
@@ -17,8 +18,8 @@ __pycache__/
 
 # MNIST 資料集（可重新下載，不進版控）
 MNIST/raw/
-=======
+
+# Notes 伺服器本機設定與資料
 notes_client_config.json
 notes_server/data/*.json
 notes_server/certs/
->>>>>>> Stashed changes
