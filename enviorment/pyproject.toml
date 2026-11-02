@@ -1,0 +1,23 @@
+[project]
+name = "enviorment"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Roy Zeng", email = "142411359+RoyZeng0317@users.noreply.github.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "python-dotenv>=1.2.4",
+]
+
+[project.scripts]
+enviorment = "enviorment:main"
+
+[[tool.uv.index]]
+url = "https://uv.agentsmirror.com/pypi/simple"
+default = true
+
+[build-system]
+requires = ["uv_build>=0.13.1,<0.14.0"]
+build-backend = "uv_build"
