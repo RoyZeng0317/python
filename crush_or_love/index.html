@@ -1,0 +1,485 @@
+<title>Crush or Love 動態歌詞</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Noto+Sans+TC:wght@500;900&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one stage (canvas + lyric track) above a compact console of effect, sync and lyric controls. Single dark "night stage" look by choice. */
+:root {
+  --ink: #0d1020;        /* stage night */
+  --ink-2: #161a30;      /* panels */
+  --line: #2a2f4d;       /* hairlines */
+  --mist: #a9adc9;       /* secondary text */
+  --paper: #f3f0fa;      /* primary text */
+  --rose: #ff6f91;       /* crush */
+  --amber: #ffc46b;      /* love */
+  --dim: rgba(243,240,250,.28);
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-lyric: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--ink); color: var(--paper);
+  font-family: var(--f-lyric); font-size: 15px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px 48px;
+}
+.wrap { max-width: 1080px; margin: 0 auto; display: grid; gap: 20px; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; }
+h1 { font-family: var(--f-display); font-weight: 800; font-size: clamp(30px, 5vw, 48px); letter-spacing: -.02em; line-height: 1; margin: 0; text-wrap: balance; }
+h1 .or { font-weight: 400; color: var(--mist); font-style: italic; }
+h1 .c { color: var(--rose); } h1 .l { color: var(--amber); }
+.byline { color: var(--mist); font-size: 13px; letter-spacing: .06em; }
+
+/* stage */
+.stage { position: relative; border-radius: 18px; overflow: hidden; aspect-ratio: 16 / 9; max-width: 100%; min-height: 360px; background: #090b17; border: 1px solid var(--line); }
+canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.viewport { position: absolute; inset: 0; overflow: hidden; -webkit-mask-image: linear-gradient(transparent, #000 22%, #000 78%, transparent); mask-image: linear-gradient(transparent, #000 22%, #000 78%, transparent); }
+.track { position: absolute; left: 0; right: 0; top: 50%; transition: transform .7s cubic-bezier(.22,1,.36,1); will-change: transform; }
+.ln { text-align: center; padding: 0 24px; height: var(--lh); display: flex; align-items: center; justify-content: center;
+  font-weight: 500; font-size: clamp(15px, 2.2vw, 22px); color: var(--dim);
+  transition: opacity .6s, transform .7s cubic-bezier(.22,1,.36,1), filter .6s; transform: scale(.92); white-space: nowrap; }
+.ln.near { opacity: .7; } .ln.far { opacity: .25; filter: blur(1.5px); }
+.ln.cur { font-weight: 900; font-size: clamp(22px, 4.4vw, 44px); transform: scale(1); opacity: 1; filter: none; }
+.ln.inst { font-family: var(--f-mono); font-size: 13px; letter-spacing: .2em; font-weight: 400; }
+.ch { display: inline-block; white-space: pre; --f: 0; }
+.ln.cur .ch {
+  background-image: linear-gradient(90deg, var(--hl) 0 calc(var(--f) * 100%), var(--dim) calc(var(--f) * 100%) 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.ln.cur .ch.kw { --hl: var(--kwc); text-shadow: 0 0 calc(var(--f) * 18px) color-mix(in srgb, var(--kwc) 70%, transparent); }
+.ch.kw[data-kw=crush] { --kwc: var(--rose); }
+.ch.kw[data-kw=love] { --kwc: var(--amber); }
+.stage { --hl: var(--paper); --kwc: var(--rose); }
+.stage.love { --kwc: var(--amber); }
+.hud { position: absolute; left: 14px; right: 14px; top: 12px; display: flex; justify-content: space-between; font-family: var(--f-mono); font-size: 11px; color: var(--mist); letter-spacing: .08em; pointer-events: none; }
+.mood { padding: 2px 8px; border-radius: 99px; border: 1px solid currentColor; color: var(--kwc); text-transform: uppercase; transition: color .6s; }
+.demo-tag { position: absolute; left: 14px; bottom: 10px; font-size: 11px; color: var(--mist); opacity: .8; pointer-events: none; }
+
+/* transport */
+.transport { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.play { width: 52px; height: 52px; border-radius: 50%; border: 0; background: var(--paper); color: var(--ink); cursor: pointer; display: grid; place-items: center; flex: none; transition: transform .15s; }
+.play:hover { transform: scale(1.06); }
+.play svg { width: 20px; height: 20px; fill: currentColor; }
+.bar { flex: 1 1 260px; display: flex; align-items: center; gap: 10px; font-family: var(--f-mono); font-size: 12px; color: var(--mist); font-variant-numeric: tabular-nums; min-width: 0; }
+input[type=range] { flex: 1; accent-color: var(--rose); min-width: 0; }
+button:focus-visible, input:focus-visible, textarea:focus-visible, label.btn:focus-within { outline: 2px solid var(--amber); outline-offset: 2px; }
+
+/* console */
+.console { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.panel { background: var(--ink-2); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.panel h2 { margin: 0; font-family: var(--f-display); font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--mist); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font: inherit; font-size: 14px; padding: 6px 12px; border-radius: 99px; border: 1px solid var(--line); background: transparent; color: var(--paper); cursor: pointer; }
+.chip[aria-pressed=true] { background: var(--paper); color: var(--ink); border-color: var(--paper); font-weight: 900; }
+.row { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--mist); }
+.row label { width: 64px; flex: none; }
+.row output { font-family: var(--f-mono); width: 56px; text-align: right; color: var(--paper); font-variant-numeric: tabular-nums; }
+textarea { width: 100%; min-height: 150px; resize: vertical; background: var(--ink); color: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 10px; font-family: var(--f-mono); font-size: 12px; line-height: 1.55; }
+.btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn { font: inherit; font-size: 13px; padding: 7px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--ink); color: var(--paper); cursor: pointer; }
+.btn.primary { background: var(--rose); border-color: var(--rose); color: #1a0710; font-weight: 900; }
+label.btn input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+label.btn { position: relative; }
+.note { font-size: 12px; color: var(--mist); margin: 0; }
+.status { font-size: 12px; color: var(--amber); min-height: 1.2em; margin: 0; }
+
+/* spec */
+.spec { overflow-x: auto; }
+.spec table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 560px; }
+.spec th, .spec td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.spec th { font-family: var(--f-display); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--mist); font-weight: 700; }
+.spec td:first-child { font-weight: 900; white-space: nowrap; }
+.spec code { font-family: var(--f-mono); font-size: 12px; color: var(--amber); }
+
+@media (max-width: 560px) { .stage { aspect-ratio: auto; height: 380px; } }
+@media (prefers-reduced-motion: reduce) { .track, .ln { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1><span class="c">Crush</span> <span class="or">or</span> <span class="l">Love</span></h1>
+    <div class="byline">周柯宇 · 動態歌詞動畫設計稿</div>
+  </header>
+
+  <section class="stage" id="stage" aria-label="歌詞動畫舞台">
+    <canvas id="fx"></canvas>
+    <div class="viewport"><div class="track" id="track"></div></div>
+    <div class="hud"><span id="hudTime">00:00.0</span><span class="mood" id="mood">crush</span><span id="hudBeat">96 BPM</span></div>
+    <div class="demo-tag" id="demoTag">示範歌詞為原創文字，非原曲歌詞。匯入你的 LRC 即可替換。</div>
+  </section>
+
+  <div class="transport">
+    <button class="play" id="play" aria-label="播放"><svg viewBox="0 0 24 24" id="playIcon"><path d="M7 4.5v15l13-7.5z"/></svg></button>
+    <div class="bar"><span id="tNow">0:00</span><input type="range" id="seek" min="0" max="1000" value="0" aria-label="播放進度"><span id="tEnd">0:00</span></div>
+  </div>
+
+  <div class="console">
+    <div class="panel">
+      <h2>歌詞效果</h2>
+      <div class="chips" id="modes">
+        <button class="chip" data-mode="fill" aria-pressed="true">卡拉OK填色</button>
+        <button class="chip" data-mode="pop" aria-pressed="false">逐字彈跳</button>
+        <button class="chip" data-mode="wave" aria-pressed="false">波浪</button>
+        <button class="chip" data-mode="focus" aria-pressed="false">模糊聚焦</button>
+      </div>
+      <div class="row"><label for="bpm">節拍</label><input type="range" id="bpm" min="60" max="160" value="96"><output id="bpmOut">96</output></div>
+      <div class="row"><label for="offset">同步偏移</label><input type="range" id="offset" min="-2" max="2" step="0.05" value="0"><output id="offOut">0.00s</output></div>
+      <div class="row"><label for="hearts">愛心量</label><input type="range" id="hearts" min="0" max="3" step="0.5" value="1.5"><output id="heartOut">1.5×</output></div>
+    </div>
+
+    <div class="panel">
+      <h2>音樂與歌詞</h2>
+      <div class="btns">
+        <label class="btn primary">載入音樂檔<input type="file" id="audioFile" accept="audio/*"></label>
+        <label class="btn">載入 .lrc 檔<input type="file" id="lrcFile" accept=".lrc,.txt,text/plain"></label>
+      </div>
+      <textarea id="lrc" spellcheck="false" aria-label="LRC 歌詞"></textarea>
+      <div class="btns">
+        <button class="btn" id="apply">套用歌詞</button>
+        <button class="btn" id="reset">還原示範</button>
+      </div>
+      <p class="status" id="status"></p>
+      <p class="note">格式：<code style="font-family:var(--f-mono)">[mm:ss.xx]歌詞</code>，每行一句。沒載入音樂時用內建時鐘播放；載入後歌詞會跟著音樂時間走。</p>
+    </div>
+  </div>
+
+  <div class="panel spec">
+    <h2>動畫能力確認</h2>
+    <table>
+      <thead><tr><th>動畫</th><th>做法</th><th>參數</th></tr></thead>
+      <tbody>
+        <tr><td>逐字填色</td><td>每個字依這句的進度從左到右填上亮色</td><td>依時間線性內插，每幀更新 <code>--f</code></td></tr>
+        <tr><td>歌詞捲動</td><td>換句時整條歌詞滑動，當前句放大，前後句淡出變模糊</td><td><code>0.7s cubic-bezier(.22,1,.36,1)</code></td></tr>
+        <tr><td>逐字彈跳</td><td>正在唱的字往上跳再落下</td><td>位移 −14px，跟填色同步</td></tr>
+        <tr><td>波浪</td><td>整句字像水波一樣起伏</td><td>sin 波，相位差 0.45／字</td></tr>
+        <tr><td>模糊聚焦</td><td>還沒唱到的字模糊，唱到時變清楚</td><td>blur 8px → 0</td></tr>
+        <tr><td>關鍵字</td><td>唱到 crush / love 時字發光，並從字的位置冒出愛心</td><td>crush 玫瑰粉、love 琥珀金</td></tr>
+        <tr><td>情緒色調</td><td>歌詞裡出現的字決定背景色調，crush 偏粉、love 偏暖</td><td>色相漸變約 1.5 秒</td></tr>
+        <tr><td>節拍脈衝</td><td>背景光環和光點依 BPM 跳動</td><td>60–160 BPM 可調</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+(() => {
+  const SAMPLE = `[00:00.50](前奏)
+[00:04.00]走廊盡頭 你回頭看我一眼
+[00:08.00]心跳突然 漏掉了半拍
+[00:12.00]是 crush 還是 love
+[00:16.00]我反覆問自己 一遍又一遍
+[00:20.00]訊息打好又刪掉
+[00:24.00]怕太靠近 又怕太遠
+[00:28.00]Is it a crush or is it love
+[00:32.00]答案藏在你的笑裡面
+[00:36.00]如果這只是一場心動
+[00:40.00]為什麼想你的時間越來越長
+[00:44.00]Crush or love 都不重要了
+[00:48.00]我只想站在你身邊
+[00:52.00](間奏)
+[00:58.00]`;
+
+  const $ = id => document.getElementById(id);
+  const stage = $('stage'), track = $('track'), cvs = $('fx'), ctx = cvs.getContext('2d');
+  const audio = new Audio();
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  let lines = [], lineEls = [], curIdx = -1, duration = 58;
+  let mode = 'fill', bpm = 96, offset = 0, heartRate = 1.5;
+  let playing = false, clock = 0, lastTs = 0, useAudio = false;
+  let moodHue = 0, moodTarget = 0; // 0 = crush (rose), 1 = love (amber)
+
+  // ---------- LRC ----------
+  function parseLRC(text) {
+    const out = [];
+    text.split(/\r?\n/).forEach(raw => {
+      const tags = [...raw.matchAll(/\[(\d{1,2}):(\d{1,2}(?:\.\d{1,3})?)\]/g)];
+      if (!tags.length) return;
+      const txt = raw.replace(/\[[^\]]*\]/g, '').trim();
+      tags.forEach(m => out.push({ t: +m[1] * 60 + parseFloat(m[2]), text: txt }));
+    });
+    out.sort((a, b) => a.t - b.t);
+    for (let i = 0; i < out.length; i++) out[i].end = i + 1 < out.length ? out[i + 1].t : out[i].t + 5;
+    return out.filter(l => l.text !== '' || false);
+  }
+
+  function build(text) {
+    const parsed = parseLRC(text);
+    if (!parsed.length) { $('status').textContent = '沒有讀到歌詞。每行要以 [mm:ss.xx] 開頭。'; return false; }
+    lines = parsed;
+    const lastTag = [...text.matchAll(/\[(\d{1,2}):(\d{1,2}(?:\.\d{1,3})?)\]/g)].pop();
+    const lastT = lastTag ? +lastTag[1] * 60 + parseFloat(lastTag[2]) : 0;
+    if (!useAudio) duration = Math.max(lastT, lines[lines.length - 1].end);
+    track.innerHTML = '';
+    lineEls = lines.map(l => {
+      const el = document.createElement('div');
+      el.className = 'ln' + (/^\(.*\)$|^（.*）$/.test(l.text) ? ' inst' : '');
+      const kw = keywordMask(l.text);
+      [...l.text].forEach((c, i) => {
+        const s = document.createElement('span');
+        s.className = 'ch' + (kw[i] ? ' kw' : '');
+        if (kw[i]) s.dataset.kw = kw[i];
+        s.textContent = c;
+        el.appendChild(s);
+      });
+      track.appendChild(el);
+      return { el, chars: [...el.children], fired: new Set() };
+    });
+    curIdx = -1;
+    $('tEnd').textContent = fmt(duration);
+    return true;
+  }
+
+  function keywordMask(text) {
+    const mask = new Array([...text].length).fill(null);
+    const lower = text.toLowerCase();
+    for (const [word, tag] of [['crush', 'crush'], ['love', 'love'], ['心動', 'crush'], ['喜歡', 'crush'], ['愛', 'love']]) {
+      let i = lower.indexOf(word);
+      while (i !== -1) { for (let k = 0; k < word.length; k++) mask[i + k] = tag; i = lower.indexOf(word, i + word.length); }
+    }
+    return mask;
+  }
+
+  // ---------- timing ----------
+  const now = () => (useAudio ? audio.currentTime : clock) + offset;
+  const fmt = s => { s = Math.max(0, s); return Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0'); };
+
+  function findLine(t) {
+    let idx = -1;
+    for (let i = 0; i < lines.length; i++) { if (lines[i].t <= t) idx = i; else break; }
+    return idx;
+  }
+
+  function lineHeight() { return stage.clientHeight < 420 ? 52 : Math.round(stage.clientHeight / 6.2); }
+
+  function layout(idx) {
+    const lh = lineHeight();
+    track.style.setProperty('--lh', lh + 'px');
+    lineEls.forEach(({ el }, i) => {
+      const d = Math.abs(i - idx);
+      el.classList.toggle('cur', i === idx);
+      el.classList.toggle('near', d === 1);
+      el.classList.toggle('far', d > 1);
+    });
+    const center = Math.max(idx, 0);
+    track.style.transform = `translateY(${-(center * lh + lh / 2)}px)`;
+  }
+
+  // ---------- per-frame lyric styling ----------
+  function styleLine(idx, t, ts) {
+    if (idx < 0) return;
+    const L = lines[idx], E = lineEls[idx];
+    const n = E.chars.length;
+    // sing over 85% of the gap so the line finishes before the next one
+    const span = Math.max(0.6, Math.min(L.end - L.t, 8) * 0.85);
+    const p = Math.min(1, Math.max(0, (t - L.t) / span));
+    const head = p * n;
+    E.chars.forEach((c, i) => {
+      const f = Math.min(1, Math.max(0, head - i));
+      c.style.setProperty('--f', f.toFixed(3));
+      let tf = '', filter = '', op = '';
+      if (!reduce) {
+        if (mode === 'pop') {
+          const k = f > 0 && f < 1 ? Math.sin(f * Math.PI) : 0;
+          tf = `translateY(${(-14 * k).toFixed(1)}px) scale(${(1 + 0.18 * k).toFixed(3)})`;
+        } else if (mode === 'wave') {
+          tf = `translateY(${(Math.sin(ts / 260 - i * 0.45) * 7).toFixed(1)}px)`;
+        } else if (mode === 'focus') {
+          filter = `blur(${((1 - f) * 8).toFixed(1)}px)`; op = (0.35 + 0.65 * f).toFixed(2);
+          tf = `scale(${(0.9 + 0.1 * f).toFixed(3)})`;
+        }
+      }
+      c.style.transform = tf; c.style.filter = filter; c.style.opacity = op;
+      // keyword reached → hearts
+      if (c.dataset.kw && f > 0.5 && !E.fired.has(i)) {
+        E.fired.add(i);
+        const r = c.getBoundingClientRect(), sr = stage.getBoundingClientRect();
+        burst(r.left - sr.left + r.width / 2, r.top - sr.top + r.height / 2, c.dataset.kw);
+      }
+    });
+  }
+
+  function setMoodFrom(idx) {
+    if (idx < 0) return;
+    const text = lines[idx].text.toLowerCase();
+    if (/love|愛/.test(text) && !/crush/.test(text.split('love')[1] || '')) moodTarget = 1;
+    if (/crush|心動|喜歡/.test(text) && !/love|愛/.test(text)) moodTarget = 0;
+    if (/crush/.test(text) && /love/.test(text)) moodTarget = text.lastIndexOf('love') > text.lastIndexOf('crush') ? 1 : 0;
+    stage.classList.toggle('love', moodTarget === 1);
+    $('mood').textContent = moodTarget ? 'love' : 'crush';
+  }
+
+  // ---------- canvas fx ----------
+  let W = 0, H = 0, dpr = 1;
+  const motes = [], hearts = [];
+  function resize() {
+    dpr = Math.min(2, devicePixelRatio || 1);
+    W = stage.clientWidth; H = stage.clientHeight;
+    cvs.width = W * dpr; cvs.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    layout(curIdx);
+  }
+  for (let i = 0; i < 70; i++) motes.push({ x: Math.random(), y: Math.random(), r: 0.6 + Math.random() * 2.6, s: 0.008 + Math.random() * 0.03, ph: Math.random() * 6.28 });
+
+  function burst(x, y, kw) {
+    const count = Math.round(5 * heartRate);
+    for (let i = 0; i < count; i++) {
+      const a = -Math.PI / 2 + (Math.random() - 0.5) * 1.8;
+      const v = 60 + Math.random() * 120;
+      hearts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 1, size: 6 + Math.random() * 9, rot: (Math.random() - 0.5) * 0.8, kw });
+    }
+  }
+
+  function heartPath(s) {
+    ctx.beginPath();
+    ctx.moveTo(0, s * 0.35);
+    ctx.bezierCurveTo(-s * 1.1, -s * 0.35, -s * 0.45, -s * 1.05, 0, -s * 0.45);
+    ctx.bezierCurveTo(s * 0.45, -s * 1.05, s * 1.1, -s * 0.35, 0, s * 0.35);
+    ctx.closePath();
+  }
+
+  const mix = (a, b, k) => a.map((v, i) => Math.round(v + (b[i] - v) * k));
+  const ROSE = [255, 111, 145], AMBER = [255, 196, 107], NIGHT_C = [22, 14, 40], NIGHT_L = [30, 18, 14];
+
+  function draw(dt, t) {
+    moodHue += (moodTarget - moodHue) * Math.min(1, dt * 1.6);
+    const acc = mix(ROSE, AMBER, moodHue), bg = mix(NIGHT_C, NIGHT_L, moodHue);
+    const beatLen = 60 / bpm;
+    const beatPh = playing ? ((t % beatLen) + beatLen) % beatLen / beatLen : 0.5;
+    const pulse = playing && !reduce ? Math.pow(1 - beatPh, 3) : 0;
+
+    // backdrop
+    const g = ctx.createRadialGradient(W / 2, H * 0.55, 0, W / 2, H * 0.55, Math.max(W, H) * 0.75);
+    g.addColorStop(0, `rgb(${mix(bg, acc, 0.22 + pulse * 0.12)})`);
+    g.addColorStop(1, '#07080f');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+
+    // beat rings
+    if (!reduce) {
+      const R = Math.min(W, H) * (0.28 + beatPh * 0.35);
+      ctx.strokeStyle = `rgba(${acc},${(0.22 * (1 - beatPh)).toFixed(3)})`;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(W / 2, H / 2, R, 0, Math.PI * 2); ctx.stroke();
+    }
+
+    // drifting motes
+    ctx.globalCompositeOperation = 'lighter';
+    motes.forEach(m => {
+      if (!reduce) { m.y -= m.s * dt * (playing ? 1 : 0.3); if (m.y < -0.05) { m.y = 1.05; m.x = Math.random(); } }
+      const x = m.x * W + Math.sin(m.ph + m.y * 6) * 18, y = m.y * H;
+      const r = m.r * (1 + pulse * 0.8);
+      ctx.fillStyle = `rgba(${acc},${(0.25 + 0.35 * Math.sin(m.ph + t)).toFixed(3) * 0.6 + 0.1})`;
+      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+    });
+
+    // hearts
+    for (let i = hearts.length - 1; i >= 0; i--) {
+      const h = hearts[i];
+      h.life -= dt * 0.75; if (h.life <= 0) { hearts.splice(i, 1); continue; }
+      h.vy += 90 * dt * 0.4; h.vx *= 0.985;
+      h.x += h.vx * dt; h.y += h.vy * dt - 30 * dt;
+      const c = h.kw === 'love' ? AMBER : ROSE;
+      ctx.save(); ctx.translate(h.x, h.y); ctx.rotate(h.rot);
+      ctx.globalAlpha = Math.min(1, h.life * 1.4);
+      ctx.fillStyle = `rgb(${c})`;
+      heartPath(h.size * (0.6 + 0.4 * h.life)); ctx.fill();
+      ctx.restore();
+    }
+    ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+  }
+
+  // ---------- loop ----------
+  function frame(ts) {
+    const dt = lastTs ? Math.min(0.05, (ts - lastTs) / 1000) : 0;
+    lastTs = ts;
+    if (playing && !useAudio) { clock += dt; if (clock >= duration) { clock = 0; resetFired(); } }
+    const t = now();
+    const idx = findLine(t);
+    if (idx !== curIdx) {
+      if (curIdx >= 0 && lineEls[curIdx]) lineEls[curIdx].chars.forEach(c => { c.style.transform = ''; c.style.filter = ''; c.style.opacity = ''; });
+      curIdx = idx; layout(idx); setMoodFrom(idx);
+    }
+    styleLine(idx, t, ts);
+    draw(dt, t);
+    const raw = useAudio ? audio.currentTime : clock;
+    $('hudTime').textContent = `${String(Math.floor(raw / 60)).padStart(2, '0')}:${(raw % 60).toFixed(1).padStart(4, '0')}`;
+    $('tNow').textContent = fmt(raw);
+    if (!seeking) $('seek').value = Math.round(raw / (duration || 1) * 1000);
+    requestAnimationFrame(frame);
+  }
+
+  function resetFired() { lineEls.forEach(e => e.fired.clear()); }
+
+  // ---------- controls ----------
+  const ICON_PLAY = '<path d="M7 4.5v15l13-7.5z"/>', ICON_PAUSE = '<path d="M6 4h4.5v16H6zM13.5 4H18v16h-4.5z"/>';
+  function setPlaying(v) {
+    playing = v;
+    $('playIcon').innerHTML = v ? ICON_PAUSE : ICON_PLAY;
+    $('play').setAttribute('aria-label', v ? '暫停' : '播放');
+    if (useAudio) { if (v) audio.play().catch(() => setPlaying(false)); else audio.pause(); }
+  }
+  $('play').onclick = () => setPlaying(!playing);
+  document.addEventListener('keydown', e => { if (e.code === 'Space' && !/TEXTAREA|INPUT/.test(e.target.tagName)) { e.preventDefault(); setPlaying(!playing); } });
+
+  let seeking = false;
+  const seek = $('seek');
+  seek.addEventListener('input', () => {
+    seeking = true;
+    const s = seek.value / 1000 * duration;
+    if (useAudio) audio.currentTime = s; else clock = s;
+    resetFired();
+  });
+  seek.addEventListener('change', () => { seeking = false; });
+
+  $('modes').addEventListener('click', e => {
+    const b = e.target.closest('.chip'); if (!b) return;
+    mode = b.dataset.mode;
+    [...$('modes').children].forEach(c => c.setAttribute('aria-pressed', c === b));
+    if (curIdx >= 0) lineEls[curIdx].chars.forEach(c => { c.style.transform = ''; c.style.filter = ''; c.style.opacity = ''; });
+  });
+  $('bpm').oninput = e => { bpm = +e.target.value; $('bpmOut').textContent = bpm; $('hudBeat').textContent = bpm + ' BPM'; };
+  $('offset').oninput = e => { offset = +e.target.value; $('offOut').textContent = (offset >= 0 ? '+' : '') + offset.toFixed(2) + 's'; };
+  $('hearts').oninput = e => { heartRate = +e.target.value; $('heartOut').textContent = heartRate + '×'; };
+
+  const lrcBox = $('lrc');
+  lrcBox.value = SAMPLE;
+  $('apply').onclick = () => {
+    if (build(lrcBox.value)) {
+      $('status').textContent = `已套用 ${lines.length} 句歌詞。`;
+      $('demoTag').hidden = lrcBox.value.trim() !== SAMPLE.trim() ? true : false;
+      resetFired();
+    }
+  };
+  $('reset').onclick = () => { lrcBox.value = SAMPLE; $('apply').onclick(); $('demoTag').hidden = false; };
+
+  $('lrcFile').onchange = e => {
+    const f = e.target.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = () => { lrcBox.value = r.result; $('apply').onclick(); };
+    r.readAsText(f);
+  };
+  $('audioFile').onchange = e => {
+    const f = e.target.files[0]; if (!f) return;
+    setPlaying(false);
+    audio.src = URL.createObjectURL(f);
+    audio.onloadedmetadata = () => {
+      useAudio = true; duration = audio.duration || duration;
+      $('tEnd').textContent = fmt(duration);
+      $('status').textContent = `已載入「${f.name}」。按播放開始，歌詞跟著音樂走。`;
+      resetFired();
+    };
+    audio.onended = () => { setPlaying(false); resetFired(); };
+  };
+
+  build(SAMPLE);
+  // open on a lyric line so the still frame shows the effect
+  clock = 12.9;
+  addEventListener('resize', resize);
+  new ResizeObserver(resize).observe(stage);
+  resize();
+  requestAnimationFrame(frame);
+})();
+</script>
